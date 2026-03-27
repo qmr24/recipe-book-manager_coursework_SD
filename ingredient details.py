@@ -6,9 +6,8 @@ units = ['g', 'kg', 'ml', 'l', 'cup', 'tbsp', 'tsp', 'piece']
 def validate_recipe_input():   
     global rec_count
     global recipes
-    ing = []  
-    count = 0
-    main_ing=[]
+      
+    
 
     while True:     
         receipe_name = input("Enter the recipe name: ")      
@@ -48,6 +47,9 @@ def validate_recipe_input():
         break   
 
 
+    count = 0
+    main_ing=[]
+    ing = []
     while True:
         try:
             ingr_count = int(input("Enter the number of ingredients (3-20): "))
@@ -293,6 +295,7 @@ def save_rec():
                 f.write(f"TAGS:{','.join(recipes[key]['tags'])}\n")
                 f.write("===END===\n")
                 #recipes[rec_num] = {"name": receipe_name,"Ingredients": main_ing, "time": time,"Category": rec_cate,"tags":tags}
+            f.close()
             print("Recipes saved successfully to recipes.txt")
         else:
             print("you must enter atleast one recipe inorder to save in the file")
@@ -310,9 +313,7 @@ def prevsa():
             if read == "":
                 break
             read = read.strip()
-            if read == "===RECIPE===":
-                rec_count = rec_count + 1
-            elif read.startswith("ID:"):
+            if read.startswith("ID:"):
                 rec_num = read[3:]
                 recipes[rec_num] = {}
                 recipes[rec_num]["Ingredients"] = []
@@ -327,6 +328,7 @@ def prevsa():
             elif "|" in read:
                 parts = read.split("|")
                 recipes[rec_num]["Ingredients"].append((parts[0], parts[1], parts[2]))
+        rec_count=len(recipes)+1
         f.close()
         print(f"Loaded {rec_count - 1} recipes successfully")
     except:
@@ -361,10 +363,10 @@ def search_ingredient():
         try:
             found=0
             ask=input("enter the ingredient name")
-            for i in recipes:
-                for y in recipes[i]["Ingredients"]:
-                    if ask.lower() in y[0].lower():
-                        print(recipes[i]["name"])
+            for recipe_id in recipes:
+                for item in recipes[recipe_id]["Ingredients"]:
+                    if ask.lower() in item[0].lower():
+                        print(recipes[recipe_id]["name"])
                         found=found+1
                         break
             print(f"we found{found} recipes related to {ask} ingredient name")
@@ -383,28 +385,297 @@ def search_ingredient():
             #recipes[rec_num] = {"name": receipe_name,"Ingredients": main_ing, "time": time,"Category": rec_cate,"tags":tags}
 
 def filter_recipes():
+    global recipes
+    results=[]
+    
     time=input("do you want filter by time (yes/no)")
     if time.lower()=="yes":
-        max_time=int(input("enter the maximun cooking time in minutes"))
-        min_time=int(input("enter the maximun cooking time in minutes"))
+        max_time=input("enter the maximun cooking time ")
+        min_time=input("enter the minimum cooking time ")
+        max_time_cal=int(max_time[0:2])*60+int(max_time[3:5])
+        min_time_cal=int(min_time[0:2])*60+int(min_time[3:5])
+        for key in recipes:
+            time=recipes[key]["time"]
+            time_cal=int(time[0:2])*60+int(time[3:5])
+            if max_time_cal > time_cal > min_time_cal:
+                results.append(key)
     no_ingredient=input("do you want filter by no.ingredients (yes/no)")
     if no_ingredient.lower()=="yes":
         max_ingre=int(input("enter the maximum ingredient count"))
         min_ingre=int(input("enter the minimum ingredient count"))
+        for key in recipes:
+            ingre_count=len(recipes[key]['Ingredients'])
+            if max_ingre > ingre_count >  min_ingre:
+                if  key not in results :
+                    results.append(key)
+        
+                        
     cate=input("do you want filter by category (yes/no)")
-    if cate.lower():
+    if cate.lower()== "yes":
         categ=input("enter the category name")
+        for key in recipes:
+            if categ.upper()== recipes[key]["Category"]:
+                if  key not in results :
+                    results.append(key)
+    print(results)
+
+
+def edit_reci():
+    try:
+        global recipes
+        rec_id=input("enter the recipe id")
+        if rec_id.upper() in recipes:
+            print(" 1.change name \n 2.add an ingredient \n 3.remove an ingredient \n 4.update cooking time \n 5.change category \n 6.modify tags")
+            ser_num=int(input("enter the service number"))
+            if ser_num == 1 :
+                while True:
+                    receipe_name= input("enter the new name to be changed to the recipe")
+                    if len(receipe_name) == 0:   
+                        print("Recipe name can't be empty.")
+                        continue
+                    if not (3 <= len(receipe_name) <= 50):    
+                        print("Recipe name should contain between 3 and 50 characters.")
+                        continue
+                    if receipe_name.isspace():      
+                        print("Recipe name can't contain only spaces.")
+                        continue
+
+                    valid = True   
+                    letter = False  
+
+                    for i in range(len(receipe_name)):      
+                        if receipe_name[i].isalpha():       
+                            letter = True
+                        elif receipe_name[i] in (" ", "-", "'"):    
+                            pass    
+                        else:   
+                            print("Only letters, hyphen (-), apostrophe ('), and space are allowed.")
+                            valid = False
+                            break   
+
+                    if valid == False:   
+                        continue    
+
+                    if letter == False:
+                        print("Recipe name must contain at least one letter.")
+                        continue   
+                    break   
+                recipes[rec_id]['name']=receipe_name
+                print(f"Recipe {rec_id} updated successfully")
+
+            elif ser_num == 2:
+                global units
+                while True:
+                    ing_name = input("Enter the ingredient name: ")
+                    if not (3 <= len(ing_name) <= 30):
+                        print("Ingredient name should be between 3 and 30 characters.")
+                        continue
+                    break
+
+                while True:
+                    try:
+                        ing_quan = float(input("Enter the quantity of the ingredient: "))
+                        if ing_quan > 0:
+                            
+                            break
+                        else:
+                            print("Ingredient quantity should be greater than 0.")
+                    except ValueError:
+                        print("Please enter a valid number.")
+
+                while True:
+                    ing_uni = input("Enter the unit (g, kg, ml, l, cup, tbsp, tsp, piece): ")
+                    if ing_uni.lower() in units:
+                        break
+                    else:
+                        print("Invalid unit! Accepted units: g, kg, ml, l, cup, tbsp, tsp, piece")
+                recipes[rec_id]["main_ing"].append((ing_name,ing_quan,ing_uni))
+                print(f"Recipe {rec_id} updated successfully")
+        
+
+            elif ser_num == 3:
+                try:
+                    del_ing_name = input("Enter the ingredient name to remove: ")
+                    del_ing_name=del_ing_name.lower()
+
+                    for item in recipes[rec_id]["main_ing"]:
+                        if del_ing_name == item[0].lower():
+                            recipes[rec_id]["main_ing"].remove(item)
+                            print(f"Recipe {rec_id} removed successfully")
+                            break
+                        else:
+                            print("Ingredient not found")
+
+                except:
+                    print("Enter valid inputs")
+
+
+            elif ser_num == 4:
+                while True:
+                    try:
+                        time = input("Enter the cooking time as HH:MM: ")
+                        if len(time) == 5 and time[2] == ":":
+                            Hour = int(time[0:2])
+                            Min = int(time[3:5])
+                            if not (0 <= Hour <= 12 and 0 <= Min <= 59):
+                                print("Invalid hours or minutes. Hours: 0-12, Minutes: 0-59.")
+                                continue
+                            if 5 <= (Hour * 60) + Min <= 720:
+                                break
+                            else:
+                                print("Time must be between 00:05 and 12:00.")
+                        else:
+                            print("Time format is wrong. It should be HH:MM (e.g. 01:30).")
+                    except ValueError:
+                        print("Enter the time in correct format HH:MM.")
+                print(f"Recipe {rec_id} time updated successfully")
+                recipes[rec_id]["time"]=time
+
+            elif ser_num == 5:
+                cate = ["BREAKFAST", "LUNCH", "DINNER", "DESSERT", "SNACK", "BEVERAGE"]
+                while True:
+                    rec_cate = input("Enter the recipe category (BREAKFAST, LUNCH, DINNER, DESSERT, SNACK, BEVERAGE): ")
+                    if rec_cate.upper() in cate:
+                        rec_cate = rec_cate.upper()  
+                        break
+                    print("Invalid category. Please choose from: BREAKFAST, LUNCH, DINNER, DESSERT, SNACK, BEVERAGE")
+                print(f"Recipe {rec_id} Category updated successfully")
+                recipes[rec_id]["Category"]=rec_cate
+
+            elif ser_num == 6:
+                tags=set()
+                while True:
+                    rec_tags=input("enter the tags related to this recipe")
+                    tags.add(rec_tags)
+                    permission=input("add more or enough(+/-)")
+                    if permission=="+":
+                        continue
+                    elif permission=="-":
+                        break
+                print(f"Recipe {rec_id} tags updated successfully")
+                recipes[rec_id]["tags"]=tags
+
+
+        else:
+            print("enter a valid recipe id")
+    except:
+        print("error crashed")
+
+
+def statis():
+    bre_count=0
+    lun_count=0
+    din_count=0
+    des_count=0
+    sna_count=0
+    bev_count=0
+    global recipes
+    print("========================================  \n")
+    print("RECIPE BOOK SUMMARY \n ")
+    print("======================================== \n ")
+
+    print(f"Total Recipes:{len(recipes)} \n \n ")
+    print("Recipes by Category:")
+    for x in recipes:
+        if recipes[x]['Category'] == "BREAKFAST":
+            bre_count=bre_count+1
+        if recipes[x]['Category'] == "LUNCH":
+            lun_count=lun_count+1
+        if recipes[x]['Category'] == "DINNER":
+            din_count=din_count+1
+        if recipes[x]['Category'] == "DESSERT":
+            des_count=des_count+1
+        if recipes[x]['Category'] == "SNACK":
+            sna_count=sna_count+1
+        if recipes[x]['Category'] == "BEVERAGE":
+            bev_count=bev_count+1
+    print(f"BREAKFAST:{bre_count}")
+    print(f"LUNCH:{lun_count}")
+    print(f"DINNER:{din_count}")
+    print(f"DESSERT:{des_count}")
+    print(f"SNACK:{sna_count}")
+    print(f"BEVERAGE:{bev_count}\n \n")
+
+    print("Cooking Time Distribution:")
+    quick=0
+    medium=0
+    long=0
+    for x in recipes:
+        time_duration=recipes[x]['time']
+        time_in_min=(int(time_duration[:2])*60)+int(time_duration[3:])
+        if time_in_min < 30:
+            quick=quick + 1
+        elif 30<=time_in_min < 60:
+            medium=medium + 1
+        elif time_in_min >= 60:
+            long=long+1
+    print(f"Quick (<30 min):{quick}recipes")
+    print(f"Medium (30-60 min):{medium}recipes")
+    print(f"Long (>60 min):{long}recipes \n \n ")
+
+    print("Most Used Ingredients:\n \n ")
+    print("system on process \n \n")
+
+    total_ing=0
+    max_ing_rec=0
+    max_rec_name ="not"
+    min_ing_rec=50
+    min_rec_name = "not"
+    for x in recipes:
+        total_ing=total_ing + len(recipes[x]['Ingredients'])
+        avg_rec=total_ing/len(recipes)
+        len_ing_rec=len(recipes[x]['Ingredients'])
+        if max_ing_rec < len_ing_rec:
+            max_ing_rec=len_ing_rec
+            max_rec_name= x
+        elif min_ing_rec > len_ing_rec:
+            min_ing_rec = len_ing_rec
+            min_rec_name= x
+        
+
+
+    print(f"Average Ingredients per Recipe:{avg_rec}")
+    print(f"Largest Recipe:{max_rec_name} with {max_ing_rec} ingredients")
+    print(f"Smallest Recipe:{min_rec_name} with {min_ing_rec} ingredients \n \n")
+    print("==================================================")
     
     
+    
+    
+    
+    
+    
+        
+        
+            
+        
+            
+        
+            
+            
+            
+            
 
+            
+            
+        
+    
+       
 
-
-
-
-
-
-
+        
                 
+                
+                
+                    
+
+
+
+
+
+
+
+
+            #recipes[rec_num] = {"name": receipe_name,"Ingredients": main_ing, "time": time,"Category": rec_cate,"tags":tags}                
                 
                 
             
@@ -419,14 +690,14 @@ def filter_recipes():
 
 
 
-prevsa()
+prevsa()   
 while True:
     print("                             ")
     print("                             ")
     print("=============================")
     print("=WELCOME TO THE QUMAIR HOTEL=")
     print("Today, what you would like to do ?")
-    print(" 1.Add recipe to collection \n 2.View specific recipe by ID \n 3.List all recipe ID with names \n 4.Count recipe per category \n 5.Exit \n 6.Save \n 7.export recipe \n 8.search ingredient")
+    print(" 1.Add recipe to collection \n 2.View specific recipe by ID \n 3.List all recipe ID with names \n 4.Count recipe per category \n 5.Exit \n 6.Save \n 7.export recipe \n 8.search ingredient \n 9. filter recipes \n 10.Edit recipe \n 11.view statatics")
 
     try:
         value = int(input("enter the required service number"))
@@ -482,6 +753,14 @@ while True:
             export_recipe()
         elif value == 8:
             search_ingredient()
+        elif value == 9:
+            filter_recipes()
+        elif value == 10:
+            edit_reci()
+        elif value == 11:
+            statis()
+            
+            
             
                 
 
