@@ -472,8 +472,8 @@ def statis_category():
     sna_count=0 #assigning sna_count as 0 to count snack recipe
     bev_count=0 #assigning bev_count as 0 to count beverage recipe
     global recipes
-    print(f"{"="*18}\nRECIPE BOOK SUMMARY \n{"="*18} ")
-    print(f"Total Recipes:{len(recipes)} \n Recipes by Category:")
+    print("\n=====RECIPE BOOK SUMMARY=====")
+    print(f"Total Recipes:{len(recipes)}\n Recipes by Category:")
     for x in recipes:
         if recipes[x]['Category'] == "BREAKFAST": 
             bre_count=bre_count+1  
@@ -508,8 +508,31 @@ def statis_time():
     print(f"01.Quick (<30 min):{quick}recipes")
     print(f"02.Medium (30-60 min):{medium}recipes")
     print(f"03.Long (>60 min):{long}recipes\n ")
-    print("Most Used Ingredients:\n ")
-    print("system on process\n")
+   
+#TASK 04
+def top_ing_count():
+    global recipes
+    ing_count = {}
+    for key in recipes:
+        for i in recipes[key]["Ingredients"]:
+            ing_name = i[0].lower()
+            if ing_name in ing_count:
+                ing_count[ing_name] += 1
+            else:
+                ing_count[ing_name] = 1
+
+    sort_list= sorted(ing_count.items(), key=lambda x: x[1], reverse=True) #used ChatGpt to generate this line
+    print("\nMost Used Ingredients:")
+    if len(sort_list) == 0:
+        print("No ingredients found")
+        return
+    if len(sort_list) >= 3:
+        top_n = 3
+    else:
+        top_n = len(l)
+    for i in range(top_n):
+        print(f"{i+1}. {sort_list[i][0].capitalize()} - appears in {sort_list[i][1]} recipes")
+
 
 #TASK 04
 def statis_ingredient():
@@ -529,7 +552,7 @@ def statis_ingredient():
             min_ing_rec = len_ing_rec
             min_rec_name= x
     avg_rec=total_ing/len(recipes) #calculating the average of the ingredient
-    print(f"01.Average Ingredients per Recipe:{avg_rec}")
+    print(f"\n01.Average Ingredients per Recipe:{avg_rec}")
     print(f"02.Largest Recipe:{max_rec_name} with {max_ing_rec} ingredients")
     print(f"03.Smallest Recipe:{min_rec_name} with {min_ing_rec} ingredients")
     print(f"{'='*45}")
@@ -544,7 +567,7 @@ while True:
     print("=============================")
     print("DIGITAL RECIPE BOOK MANAGER")
     print("=============================")
-    print(" 1.Add New Recipe \n 2.View All Recipes \n 3.View Recipe by ID \n 4.Count recipe per category \n 5.Exit \n 6.Save Recipes \n 7.Export Recipe \n 8.Search by Ingredient \n 9.Filter Recipes \n 10.Edit Recipe \n 11.View Statistics")
+    print(" 1.Add New Recipe \n 2.View All Recipes \n 3.View Recipe by ID \n 4.Count recipe per category \n 5.View Statistics \n 6.Save Recipes \n 7.Export Recipe \n 8.Search by Ingredient \n 9.Filter Recipes \n 10.Edit Recipe \n 11.Exit")
     print("=============================\nEnter your choice(1-11)")
     try:
         value = int(input("Enter the required service number"))
@@ -573,8 +596,10 @@ while True:
                 add = input("Add another recipe? (yes/no)") 
                 if add.lower() == "yes":
                     pass
-                else:
+                elif add.lower()=="no":
                     break
+                else:
+                    print("invalid input")
 
         elif value == 3:
             try:
@@ -602,7 +627,7 @@ while True:
         elif value == 6:
             save_rec()
 
-        elif value == 5:
+        elif value == 11:
             try:
                 ask=input("do you want to save(yes/no)")
                 if ask.lower()=="yes":
@@ -650,10 +675,11 @@ while True:
                     print("Enter the available service number")
             except:
                 print("Enter valid input type")
-        elif value == 11:
+        elif value == 5:
             if len(recipes)>0:
                 statis_category()
                 statis_time()
+                top_ing_count()
                 statis_ingredient()
             else:
                 print("There is no recipes available to analyse")
