@@ -1,0 +1,65 @@
+
+ ===RECIPE===
+ID:RCP001
+NAME:RICE AND CURRY
+CATEGORY:LUNCH
+TIME:05:00
+Ingredients:
+rice|2.0|KG
+curry|1.0|KG
+salt|2.0|TBSP
+TAGS:LUNCHTIME
+===END===
+ 
+
+ ===RECIPE===
+ID:RCP002
+NAME:BIRIYANI
+CATEGORY:LUNCH
+TIME:00:30
+Ingredients:
+rice|2.0|KG
+water|1.0|L
+meat|2.0|KG
+TAGS:BIRIYANITIME,TASTY
+===END===
+ 
+
+ ===RECIPE===
+ID:RCP003
+NAME:MILK RICE
+CATEGORY:BREAKFAST
+TIME:00:20
+Ingredients:
+milk|500.0|L
+rice|1.0|KG
+salt|2.0|TSP
+TAGS:TRADITIOJAL FOODS
+===END===
+ 
+
+ ===RECIPE===
+ID:RCP004
+NAME:BUN
+CATEGORY:BREAKFAST
+TIME:01:00
+Ingredients:
+flour|2.0|KG
+water|2.0|L
+yeast|30.0|G
+TAGS:BARKERY,BUNTIME
+===END===
+ 
+
+ ===RECIPE===
+ID:RCP005
+NAME:rotti
+CATEGORY:BREAKFAST
+TIME:00:45
+Ingredients:
+flour|2.0|kg
+sugar|50.0|g
+onion|1.0|kg
+TAGS:srilankan,rotti
+===END===
+ 

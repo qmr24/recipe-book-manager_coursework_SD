@@ -1,0 +1,10 @@
+RECIPE: BUN
+==============================
+Category: BREAKFAST
+Cooking Time: 01:00
+INGREDIENTS:
+ flour: 2.0 KG
+ water: 2.0 L
+ yeast: 30.0 G
+TAGS: BARKERY,BUNTIME
+==============================
