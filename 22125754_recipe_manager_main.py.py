@@ -38,7 +38,6 @@ def validate_recipe_name():
 def validate_ingredient_name():
     main_ing = [] #main list which contain main ingredient information such as ingredient name,quantity,unit
     ing = []
-    
     while True:
         try:
             ingr_count = int(input("Enter the number of ingredients (3-20): ")) #assking the user number of ingredients
